@@ -12,9 +12,33 @@ app.get('/todos', (req, res) => {
   res.status(200).json(todos); // Send array as JSON
 });
 
+app.get('/todos/active', (req, res) => {
+  const active = todos.filter((t) => !t.completed);
+  res.json(active);
+});
+
+app.get('/todos/completed', (req, res) => {
+  const completed = todos.filter((t) => t.completed);
+  res.json(completed); // Custom Read!
+});
+
+// GET One – Single Read
+app.get('/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const todo = todos.find((t) => t.id === id);
+  if (!todo) return res.status(404).json({ message: 'Todo not found' });
+  res.status(200).json(todo);
+});
+
 // POST New – Create
 app.post('/todos', (req, res) => {
-  const newTodo = { id: todos.length + 1, ...req.body }; // Auto-ID
+  const { task, completed = false } = req.body;
+  if (!task || typeof task !== 'string' || !task.trim()) {
+    return res.status(400).json({ error: '"task" is required' });
+  }
+
+  const nextId = todos.length ? Math.max(...todos.map((t) => t.id)) + 1 : 1;
+  const newTodo = { id: nextId, task: task.trim(), completed: Boolean(completed) };
   todos.push(newTodo);
   res.status(201).json(newTodo); // Echo back
 });
@@ -27,6 +51,22 @@ app.patch('/todos/:id', (req, res) => {
   res.status(200).json(todo);
 });
 
+// PUT Update – Full/Replace Style
+app.put('/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const todo = todos.find((t) => t.id === id);
+  if (!todo) return res.status(404).json({ message: 'Todo not found' });
+
+  const { task, completed } = req.body;
+  if (!task || typeof task !== 'string' || !task.trim()) {
+    return res.status(400).json({ error: '"task" is required' });
+  }
+
+  todo.task = task.trim();
+  todo.completed = Boolean(completed);
+  res.status(200).json(todo);
+});
+
 // DELETE Remove
 app.delete('/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
@@ -35,11 +75,6 @@ app.delete('/todos/:id', (req, res) => {
   if (todos.length === initialLength)
     return res.status(404).json({ error: 'Not found' });
   res.status(204).send(); // Silent success
-});
-
-app.get('/todos/completed', (req, res) => {
-  const completed = todos.filter((t) => t.completed);
-  res.json(completed); // Custom Read!
 });
 
 app.use((err, req, res, next) => {
