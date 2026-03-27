@@ -19,7 +19,7 @@ app.get('/todos/active', (req, res) => {
 
 app.get('/todos/completed', (req, res) => {
   const completed = todos.filter((t) => t.completed);
-  res.json(completed); // Custom Read!
+  res.json(completed); 
 });
 
 // GET One – Single Read
@@ -40,7 +40,7 @@ app.post('/todos', (req, res) => {
   const nextId = todos.length ? Math.max(...todos.map((t) => t.id)) + 1 : 1;
   const newTodo = { id: nextId, task: task.trim(), completed: Boolean(completed) };
   todos.push(newTodo);
-  res.status(201).json(newTodo); // Echo back
+  res.status(201).json(newTodo); 
 });
 
 // PATCH Update – Partial
@@ -71,10 +71,10 @@ app.put('/todos/:id', (req, res) => {
 app.delete('/todos/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const initialLength = todos.length;
-  todos = todos.filter((t) => t.id !== id); // Array.filter() – non-destructive
+  todos = todos.filter((t) => t.id !== id); 
   if (todos.length === initialLength)
     return res.status(404).json({ error: 'Not found' });
-  res.status(204).send(); // Silent success
+  res.status(204).send(); 
 });
 
 app.use((err, req, res, next) => {
