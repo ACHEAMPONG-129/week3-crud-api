@@ -7,6 +7,10 @@ let todos = [
   { id: 2, task: 'Build CRUD API', completed: false },
 ];
 
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'CRUD API is running' });
+});
+
 // GET All – Read
 app.get('/todos', (req, res) => {
   res.status(200).json(todos); // Send array as JSON
@@ -81,5 +85,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error!' });
 });
 
-const PORT = 3002;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`Server on port ${PORT}`));
